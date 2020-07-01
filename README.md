@@ -32,17 +32,10 @@ For the attitude control, scenario 2 will be used in the simulation. The body ra
 Initially we start by implementing the body rate controller. The latter generates the command Moment as follows 
 - Calculate the error between the desired and current body rate
 - generate the moment command vector as follows 
-$$\begin{bmatrix}\tau_x,& \tau_y,&\tau_z  \end{bmatrix} = \begin{bmatrix}  k_p * p_{err} * I_x,& k_q * q_{err} * I_y,& k_r * r_{err} * I_z\end{bmatrix}$$
+![command Moments](./images/cmdMoment.png)
 Notice that we have used a P controller for the body rates p, q, r. [BodyRateControl](https://github.com/bwassim/FCND-3D-Quadrotor-Controller/blob/552d921b647f1052275d90093f553645f029aa1f/FCND-Controls-CPP/src/QuadControl.cpp#L111-L117) function, that takes as argument the desired body rates pqrCmd and the current or estimated body rates.
 Now that we have the moment command values, it is possible to derive the thrust in each rotor by solving the following set of equations
 
-$$
-\begin{align}
-f_x &= \frac{\tau_x}{l} = F_1 + F_4 - F_2 - F_3 \\
-f_y &= \frac{\tau_y}{l} = F_1 + F_2 - F_3 - F_4 \\
-f_z &= \frac{\tau_z}{l} = F_1 + F_3 - F_2 - F_4 \\
-f_t &= F_1 + F_2 + F_3 + F_4
-\end{align}
-$$
+![thrust equations](./images/thrust_equations.png)
 
 The result is coded in the [GenerateMotorCommands](https://github.com/bwassim/FCND-3D-Quadrotor-Controller/blob/552d921b647f1052275d90093f553645f029aa1f/FCND-Controls-CPP/src/QuadControl.cpp#L73-L82) function. We start by tunning the parameters kpPQR until
