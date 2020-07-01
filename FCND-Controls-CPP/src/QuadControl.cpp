@@ -73,7 +73,7 @@ VehicleCommand QuadControl::GenerateMotorCommands(float collThrustCmd, V3F momen
     float l = L /sqrtf(2.f);
     float f_x = momentCmd.x / l;
     float f_y = momentCmd.y / l;
-    float f_z = momentCmd.z / kappa;
+    float f_z =  momentCmd.z / kappa;
     float f = collThrustCmd;
     
     cmd.desiredThrustsN[0] = (f_x + f_y + f_z + f) / 4.f;
@@ -113,8 +113,7 @@ V3F QuadControl::BodyRateControl(V3F pqrCmd, V3F pqr)
     M_inertia.z = Izz;
     
     rate_error = pqrCmd - pqr ;
-    momentCmd = kpPQR * rate_error ;
-    momentCmd =  M_inertia * momentCmd ;
+    momentCmd =  M_inertia * kpPQR * rate_error ;
 
   /////////////////////////////// END STUDENT CODE ////////////////////////////
 
