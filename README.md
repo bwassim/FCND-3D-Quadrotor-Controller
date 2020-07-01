@@ -1,7 +1,7 @@
 # FCND-3D-Quadrotor-Controller
 In this project, a complete cascaded controller is going to be implemented in C++. Part of the control design relies on some math that one can find on the following paper [Feed-Forward Parameter Identification for Precise Periodic
 Quadrocopter Motions](http://www.dynsyslab.org/wp-content/papercite-data/pdf/schoellig-acc12.pdf).
- 
+
 <img src="./images/pid0.png" width =700/>
 The diagram above summarizes the different control blocks that constitute the cascaded P and PD controllers.
 
@@ -39,6 +39,9 @@ Initially we start by implementing the body rate controller. The latter generate
 Notice that we have used a P controller for the body rates p, q, r. [BodyRateControl](https://github.com/bwassim/FCND-3D-Quadrotor-Controller/blob/552d921b647f1052275d90093f553645f029aa1f/FCND-Controls-CPP/src/QuadControl.cpp#L111-L117) function, that takes as argument the desired body rates pqrCmd and the current or estimated body rates.
 Now that we have the moment command values, it is possible to derive the thrust in each rotor by solving the following set of equations
 
-<img src="./images/thrust_equations.png" width="257"/>
+<img src="./images/thrust_equations.png" width="257"/> 
 
-The result is coded in the [GenerateMotorCommands](https://github.com/bwassim/FCND-3D-Quadrotor-Controller/blob/552d921b647f1052275d90093f553645f029aa1f/FCND-Controls-CPP/src/QuadControl.cpp#L73-L82) function. We start by tunning the parameters kpPQR until
+The result is coded in the [GenerateMotorCommands](https://github.com/bwassim/FCND-3D-Quadrotor-Controller/blob/552d921b647f1052275d90093f553645f029aa1f/FCND-Controls-CPP/src/QuadControl.cpp#L73-L82) function. We start by tunning the parameters kpPQR until we stabilize the rotation rate omega.x. 
+
+![body rate controlled]("./images/body_rate.gif")
+![body rate controlled]("./images/body_rate.gif")
