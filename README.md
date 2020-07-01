@@ -41,10 +41,34 @@ Now that we have the moment command values, it is possible to derive the thrust 
 
 <img src="./images/thrust_equations.png" width="257"/> 
 
-The result is coded in the [GenerateMotorCommands](https://github.com/bwassim/FCND-3D-Quadrotor-Controller/blob/552d921b647f1052275d90093f553645f029aa1f/FCND-Controls-CPP/src/QuadControl.cpp#L73-L82) function. We start by tunning the parameters kpPQR until we stabilize the rotation rate omega.x. 
+The result is coded in the [GenerateMotorCommands](https://github.com/bwassim/FCND-3D-Quadrotor-Controller/blob/552d921b647f1052275d90093f553645f029aa1f/FCND-Controls-CPP/src/QuadControl.cpp#L73-L82) function. We start by tunning the parameters kpPQR until we stabilize the rotation rate omega.x. The vehicle will consequently drift since we have not yet built the pitch roll controller. Before I proceed I would like to show you the final result in the animated figure below. 
 
 <img src="./images/body_roll_pitch.gif" width="620" /> 
 
+### Pitch Roll control 
+We won't be worrying about the Yaw angle yet. Neither the fact that the drone is loosing altitude, since the altitude controller is going to be implemented soon. 
 
+The roll-pitch controller is a P controller responsible for commanding the roll and pitch rates (pc and qc) in the body frame based on a desired global lateral acceleration, the current attitude of the quad, and desired thrust command
 
+**Note** - subscript c means "commanded" and a means "actual"
 
+where bx_a = R13 and by_a=R23. The given values can be converted into the angular velocities into the body frame by the next matrix multiplication. 
+
+<img src ="./images/dot.png" width="150"/>
+
+Remember that the lateral position controller calculates the reference accelerations in the x-y directions. Since we know the desired collective thrust denoted in the the C++ project by `collThrustCmd` (provided by the altitude controller) and the reference acceleration in the x-y direction, i.e., `accelCmd.x`, `accelCmd.y` respectively, we can derive the reference rotational angle in both directions. 
+
+<img src="./images/collCmd.png" width="200"/>
+
+We know that the last column of the rotational matrix represent the rotational angles that we need to stabilize around the reference bx_c, by_c and for that we use a P controller. 
+
+<img src="./images/bxp.png" width="200"/>
+
+These values are given in the intertial frame and needs to be converted to the body frame because the rotational acceleration from the gyros are measured in the body frame. The following transformation is needed
+
+<img src="./images/pqr.png" width="300"/>
+
+We have not talked about constraints but it is important that the bx_c and by_c belong to some interval with min, max titlt angles. 
+The code for the pitch/roll controller is given here [FCND-Controls-CPP/src/QuadControl::RollPitchControl](https://github.com/bwassim/FCND-3D-Quadrotor-Controller/blob/8b07c5182f6e955f147d2fb44334823f05316c73/FCND-Controls-CPP/src/QuadControl.cpp#L148-L173)
+
+### Scenerio 3: Position/Velocity and yaw angle control
