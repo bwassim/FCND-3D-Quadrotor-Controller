@@ -44,4 +44,8 @@ Now that we have the moment command values, it is possible to derive the thrust 
 The result is coded in the [GenerateMotorCommands](https://github.com/bwassim/FCND-3D-Quadrotor-Controller/blob/552d921b647f1052275d90093f553645f029aa1f/FCND-Controls-CPP/src/QuadControl.cpp#L73-L82) function. We start by tunning the parameters kpPQR until we stabilize the rotation rate omega.x. 
 
 
-![body rate controlled]("./images/body_rate.gif")
+<img src="./images/body_rate.gif" width="320" />
+<img src="./images/body_roll_pitch.gif" width="320" /> 
+sdfsdf
+
+
