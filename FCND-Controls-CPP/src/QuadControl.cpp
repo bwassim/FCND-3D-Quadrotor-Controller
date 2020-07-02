@@ -148,7 +148,7 @@ V3F QuadControl::RollPitchControl(V3F accelCmd, Quaternion<float> attitude, floa
     if (collThrustCmd > 0.0) {
         
         float b_x_Cmd = CONSTRAIN(accelCmd.x / coll_Cmd, -maxTiltAngle, maxTiltAngle);
-         float b_x_err = b_x_Cmd - R(0,2);
+        float b_x_err = b_x_Cmd - R(0,2);
         float b_x_p_term = kpBank * b_x_err;
         
         float b_y_Cmd =  CONSTRAIN(accelCmd.y / coll_Cmd, -maxTiltAngle, maxTiltAngle);
@@ -210,7 +210,7 @@ float QuadControl::AltitudeControl(float posZCmd, float velZCmd, float posZ, flo
 }
 
 // returns a desired acceleration in global frame
-V3F QuadControl::LateralPositionControl(V3F posCmd, V3F velCmd, V3F pos, V3F vel, V3F accelCmdFF)
+V3F QuadControl::LateralPositionControl(V3F posCmd, V3F velCmd, V3F pos, V3F vel, V3F accelCmd)
 {
   // Calculate a desired horizontal acceleration based on 
   //  desired lateral position/velocity/acceleration and current pose
@@ -229,19 +229,40 @@ V3F QuadControl::LateralPositionControl(V3F posCmd, V3F velCmd, V3F pos, V3F vel
   //    to maxSpeedXY and maxAccelXY
 
   // make sure we don't have any incoming z-component
-  accelCmdFF.z = 0;
+  accelCmd.z = 0;
   velCmd.z = 0;
   posCmd.z = pos.z;
 
   // we initialize the returned desired acceleration to the feed-forward value.
   // Make sure to _add_, not simply replace, the result of your controller
   // to this variable
-  V3F accelCmd = accelCmdFF;
-
+//  V3F accelCmd = accelCmdFF;
+  V3F kpPos;
+  V3F kpVel;
+  V3F ConVelCmd;
   ////////////////////////////// BEGIN STUDENT CODE ///////////////////////////
-
-  
-
+   
+    kpPos.x = kpVelXY;
+    kpPos.y = kpVelXY;
+    kpPos.z = 0;
+    kpVel.x = kpVelXY;
+    kpVel.y = kpVelXY;
+    kpVel.z = 0;
+    
+    // Verify the speed is within permitted limits
+    // if ||v|| > maxspeed {  v / ||v|| * maxSpeed }
+    if (velCmd.mag() > maxSpeedXY) {
+        ConVelCmd = velCmd.norm() * maxSpeedXY;
+    } else {
+        ConVelCmd = velCmd;
+    }
+    
+    accelCmd = kpPos * (posCmd - pos) + kpVel * (ConVelCmd - vel) + accelCmd;
+    
+    // make sure the acceleration respects the constraints
+    if (accelCmd.mag() > maxAccelXY) {
+        accelCmd = accelCmd.norm() * maxAccelXY;
+    }
   /////////////////////////////// END STUDENT CODE ////////////////////////////
 
   return accelCmd;
