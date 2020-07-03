@@ -73,7 +73,7 @@ VehicleCommand QuadControl::GenerateMotorCommands(float collThrustCmd, V3F momen
     float l = L /sqrtf(2.f);
     float f_x = momentCmd.x / l;
     float f_y = momentCmd.y / l;
-    float f_z =  momentCmd.z / kappa;
+    float f_z = - momentCmd.z / kappa;
     float f = collThrustCmd;
     
     cmd.desiredThrustsN[0] = (f_x + f_y + f_z + f) / 4.f;
@@ -140,13 +140,14 @@ V3F QuadControl::RollPitchControl(V3F accelCmd, Quaternion<float> attitude, floa
   //  - collThrustCmd is a force in Newtons! You'll likely want to convert it to acceleration first
 
     float p_c, q_c;
-    float coll_Cmd = collThrustCmd / mass;
+    
     V3F pqrCmd;
     Mat3x3F R = attitude.RotationMatrix_IwrtB();
 
   ////////////////////////////// BEGIN STUDENT CODE ///////////////////////////
     if (collThrustCmd > 0.0) {
         
+        float coll_Cmd = - collThrustCmd / mass;
         float b_x_Cmd = CONSTRAIN(accelCmd.x / coll_Cmd, -maxTiltAngle, maxTiltAngle);
         float b_x_err = b_x_Cmd - R(0,2);
         float b_x_p_term = kpBank * b_x_err;
@@ -163,8 +164,6 @@ V3F QuadControl::RollPitchControl(V3F accelCmd, Quaternion<float> attitude, floa
         printf("negative thrust command");
         p_c = 0;
         q_c = 0;
-        accelCmd.x = 0;
-        accelCmd.y = 0;
     }
     
     
@@ -199,13 +198,16 @@ float QuadControl::AltitudeControl(float posZCmd, float velZCmd, float posZ, flo
 
   Mat3x3F R = attitude.RotationMatrix_IwrtB();
   float thrust = 0;
-
+    
+  float Z_Pos_err = posZCmd - posZ;
+  float Z_Vel_err = velZCmd - velZ;
+  integratedAltitudeError += Z_Pos_err * dt;
   ////////////////////////////// BEGIN STUDENT CODE ///////////////////////////
-
-
-
+  float u_bar = kpPosZ * Z_Pos_err + kpVelZ * Z_Vel_err + KiPosZ * integratedAltitudeError + accelZCmd;
+  float a = (u_bar - CONST_GRAVITY) / R(2,2);
+  thrust = - mass * CONSTRAIN(a, -maxAscentRate/dt, maxAscentRate/dt) ;
+    
   /////////////////////////////// END STUDENT CODE ////////////////////////////
-  
   return thrust;
 }
 
@@ -242,8 +244,8 @@ V3F QuadControl::LateralPositionControl(V3F posCmd, V3F velCmd, V3F pos, V3F vel
   V3F ConVelCmd;
   ////////////////////////////// BEGIN STUDENT CODE ///////////////////////////
    
-    kpPos.x = kpVelXY;
-    kpPos.y = kpVelXY;
+    kpPos.x = kpPosXY;
+    kpPos.y = kpPosXY;
     kpPos.z = 0;
     kpVel.x = kpVelXY;
     kpVel.y = kpVelXY;
@@ -283,6 +285,7 @@ float QuadControl::YawControl(float yawCmd, float yaw)
 
   float yawRateCmd=0;
   ////////////////////////////// BEGIN STUDENT CODE ///////////////////////////
+    
 
 
   /////////////////////////////// END STUDENT CODE ////////////////////////////

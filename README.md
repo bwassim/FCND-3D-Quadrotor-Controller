@@ -34,13 +34,13 @@ Initially we start by implementing the body rate controller. The latter generate
 - Calculate the error between the desired and current body rate
 - generate the moment command vector as follows 
 
-<img src="./images/cmdMoment.png" width="600"/>
+<img src="./images/cmdMoment.png" width="550"/>
 
 Notice that we have used a P controller for the body rates p, q, r. [BodyRateControl](https://github.com/bwassim/FCND-3D-Quadrotor-Controller/blob/552d921b647f1052275d90093f553645f029aa1f/FCND-Controls-CPP/src/QuadControl.cpp#L111-L117) function, that takes as argument the desired body rates pqrCmd and the current or estimated body rates.
 Now that we have the moment command values, it is possible to derive the thrust in each rotor by solving the following set of equations
 
-<img src="./images/thrust_equations.png" width="257"/> 
-<img src="./images/drone1_1.png" width="257"/> 
+<img src="./images/thrust_equations.png" width="250"/> 
+<img src="./images/drone1_1.png" width="227"/> 
 
 The result is coded in the [GenerateMotorCommands](https://github.com/bwassim/FCND-3D-Quadrotor-Controller/blob/552d921b647f1052275d90093f553645f029aa1f/FCND-Controls-CPP/src/QuadControl.cpp#L73-L82) function. We start by tunning the parameters kpPQR until we stabilize the rotation rate omega.x. The vehicle will consequently drift since we have not yet built the pitch roll controller. Before I proceed I would like to show you the final result in the animated figure below. 
 
@@ -78,9 +78,9 @@ In this scenario we will explore the design of three controller blocks
 * The altitude controller: `AltitudeControl()`
 * The Yaw controller: `YawControl()`
 
-The lateral controller will use a PD controller to command target values for elements of the drone's rotation matrix. The drone generates lateral acceleration by changing the body orientation which results in non-zero thrust in the desired direction. This will translate into the commanded rotation matrix elements bx_c and by_c. The control equations have the following form:
 
-<img src="./images/lateral.png" width ="350"/>
+The lateral controller will use a PD controller to command the desired horizontal accelration based on the desired position/velocity/acceleration and current pose.
 
-For the y direction we use the same form as above.
+<img src="./images/lateral.png" width="300"/>
+
 
