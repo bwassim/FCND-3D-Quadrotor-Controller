@@ -119,7 +119,31 @@ After tweaking the gain controllers we arrive at the result seen in the above an
 The yaw control is a simple P controller and it is decoupled from the other directions, that is why it was possible to leave it to the end. Note there is another gain that affects the Yaw angle beside the `kpYaw`. It is the 3rd (z) component of kpPQR gain.
 When it comes to controlling the drone around a specific angle reference, it is important to make sure that the controlled angle remains within working bounds. Observe in the Roll Pitch controller that we implemented, we had to make sure the reference tilt angle remains within bounds. Similarly for the Yaw control, we need to constrain the Yaw angle to [-Pi, Pi].
 
-Just to avoid any issue, we take the modulo 2*Pi of the reference yaw angle initially, since we want our angle to represent a value between [0, 2Pi]. We also make sure while implementing the code to verify that the error varies between [0, Pi] or [0, -Pi]. If we assume the counterclockwise sense is positive, them of error > Pi, e.g., error = 3*Pi/3 then it is exaclty the same as saying error = -Pi/2 when looking from the other sense. Therefere if the error > Pi we substract 2Pi and when error < Pi we add 2Pi. The Yaw controller is implemented in [FCND-Controls-CPP/src/QuadControl::YawControl](https://github.com/bwassim/FCND-3D-Quadrotor-Controller/blob/309fe1099fa3b7d8098c34cd4271576c2d815203/FCND-Controls-CPP/src/QuadControl.cpp#L286-L297)
+Just to avoid any issue, we take the modulo 2*Pi of the reference yaw angle initially, since we want our angle to represent a value between [0, 2Pi]. We also make sure while implementing the code to verify that the error varies between [0, Pi] or [0, -Pi]. If we assume the counterclockwise sense is positive, then if yaw_error > Pi, e.g., error = 3*Pi/3 then it is exaclty the same as saying yaw_error = -Pi/2 when looking from the other sense. Therefere if the error > Pi we substract 2Pi and when error < Pi we add 2Pi. The Yaw controller is implemented in [FCND-Controls-CPP/src/QuadControl::YawControl](https://github.com/bwassim/FCND-3D-Quadrotor-Controller/blob/309fe1099fa3b7d8098c34cd4271576c2d815203/FCND-Controls-CPP/src/QuadControl.cpp#L286-L297)
 
 <img src="./images/yaw.gif" width="620" /> 
+
+### Scenario 4: Non-idealities and robustness
+
+In this part, we will explore some of the non-idealities and robustness of a controller. For this simulation, we will use Scenario 4. This is a configuration with 3 quads that are all are trying to move one meter forward. However, this time, these quads are all a bit different:
+
+* The green quad has its center of mass shifted back
+* The orange vehicle is an ideal quad
+* The red vehicle is heavier than usual
+
+We tweak again the controller gains to reach the result in the animation below 
+
+<img src="./images/robustness.gif" width="620" /> 
+
+#### Tracking trajectories
+We will use scenario 5 to follow two trajectories 
+
+* the orange one is following traj/FigureEight.txt
+* the other one is following traj/FigureEightFF.txt - for now this is the same trajectory.
+
+<img src="./images/traj.gif" width="620" /> 
+
+We also can see the result of the many drone scenario below 
+
+<img src="./images/traj_m.gif" width="620" /> 
 
