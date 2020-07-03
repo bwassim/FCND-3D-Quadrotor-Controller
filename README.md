@@ -121,5 +121,5 @@ When it comes to controlling the drone around a specific angle reference, it is 
 
 Just to avoid any issue, we take the modulo 2*Pi of the reference yaw angle initially, since we want our angle to represent a value between [0, 2Pi]. We also make sure while implementing the code to verify that the error varies between [0, Pi] or [0, -Pi]. If we assume the counterclockwise sense is positive, them of error > Pi, e.g., error = 3*Pi/3 then it is exaclty the same as saying error = -Pi/2 when looking from the other sense. Therefere if the error > Pi we substract 2Pi and when error < Pi we add 2Pi. The Yaw controller is implemented in 
 
-
+<img src="./images/yaw.gif" width="620" /> 
 
