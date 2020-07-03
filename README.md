@@ -78,9 +78,37 @@ In this scenario we will explore the design of three controller blocks
 * The altitude controller: `AltitudeControl()`
 * The Yaw controller: `YawControl()`
 
-
+#### Leteral position control
+```
 The lateral controller will use a PD controller to command the desired horizontal accelration based on the desired position/velocity/acceleration and current pose.
+The returned acceleration command in the x and y direction are given as follows 
+```
+<img src="./images/lateral.png" width="350"/>
 
-<img src="./images/lateral.png" width="300"/>
+**Note** - The maximum horizontal velocity and acceleration are constrained within macSpeedXY, maxAccelXY limits. The lateral control is implemented here [FCND-Controls-CPP/src/QuadControl::LateralPositionControl](https://github.com/bwassim/FCND-3D-Quadrotor-Controller/blob/0600c094be8d23a43d9b981a67c8dcdfd3edc922/FCND-Controls-CPP/src/QuadControl.cpp#L245-L266)
+
+#### Altitude control
+The altitude controller returns the quadrotor **collective thrust command** based on altitude setpoint, actual altitude vertical velocity setpoint, actual vertical velocity, and a vertical acceleration feed-forward command.
+Linear vertical acceleration can be expressed by the next linear equation 
+
+<img src="./images/acc_linear.png" width="200"/>
+
+where R is the rotational matrix. The equation above can be expressed as follows 
+
+<img src="./images/linacc2.png" width="100"/>
+
+where we previously defined the terms bx, by, bz as representing the elements of the last column of the rotation matrix. They also represent the direction of the collective thrust in the inertial frame. We are controlling the vertical acceleration:
+
+<img src="./images/ubar.png" width="150"/>
+
+Therefore 
+
+<img src="./images/cthrust.png" width="150"/>
+
+Because in the next scenerio an Integral controller part will be added to this PD controller, I decided to included it here. Note that he fact of adding it would require tweaking again all the gains from the begining. So the final result would be as follows  
+
+<img src="./images/final_altitude.png" width="500"/>
+
+The returned thrust is a force so we need to multiply c by the mass. 
 
 
