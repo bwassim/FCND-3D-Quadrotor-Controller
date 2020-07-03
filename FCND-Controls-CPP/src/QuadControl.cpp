@@ -7,7 +7,7 @@
 #include "Trajectory.h"
 #include "BaseController.h"
 #include "Math/Mat3x3F.h"
-
+#include "Angles.h"
 #ifdef __PX4_NUTTX
 #include <systemlib/param/param.h>
 #endif
@@ -285,9 +285,16 @@ float QuadControl::YawControl(float yawCmd, float yaw)
 
   float yawRateCmd=0;
   ////////////////////////////// BEGIN STUDENT CODE ///////////////////////////
-    
-
-
+    float psi_c = 0;
+    if (yawCmd > 0) {
+        psi_c = fmodf(yawCmd, 2*F_PI);
+    } else {
+        psi_c = -fmodf(-yawCmd, 2*F_PI);
+    }
+    float error = psi_c - yaw;
+    // normalize angle to -Pi, Pi
+    error = AngleNormF(error);
+    yawRateCmd = kpYaw * error;
   /////////////////////////////// END STUDENT CODE ////////////////////////////
 
   return yawRateCmd;

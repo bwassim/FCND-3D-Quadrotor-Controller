@@ -2,7 +2,7 @@
 In this project, a complete cascaded controller is going to be implemented in C++. Part of the control design relies on some math that one can find on the following paper [Feed-Forward Parameter Identification for Precise Periodic
 Quadrocopter Motions](http://www.dynsyslab.org/wp-content/papercite-data/pdf/schoellig-acc12.pdf).
 
-<img src="./images/pid0.png" width =700/>
+<img src="./images/pid0.png" width =800/>
 The diagram above summarizes the different control blocks that constitute the cascaded P and PD controllers.
 
 ## Simulator and C++ Implementation
@@ -103,12 +103,23 @@ where we previously defined the terms bx, by, bz as representing the elements of
 
 Therefore 
 
-<img src="./images/cthrust.png" width="150"/>
+<img src="./images/cthrust.png" width="140"/>
 
 Because in the next scenerio an Integral controller part will be added to this PD controller, I decided to included it here. Note that he fact of adding it would require tweaking again all the gains from the begining. So the final result would be as follows  
 
 <img src="./images/final_altitude.png" width="500"/>
 
-The returned thrust is a force so we need to multiply c by the mass. 
+The returned thrust is a force so we need to multiply c by the mass. The altitude controller is implemented in [FCND-Controls-CPP/src/QuadControl::AltitudeControl](https://github.com/bwassim/FCND-3D-Quadrotor-Controller/blob/c5c2c5f9164de61a04f45c538c3aa684b7cc2e2c/FCND-Controls-CPP/src/QuadControl.cpp#L199-L211)
+
+<img src="./images/altitude.gif" width="620" /> 
+
+After tweaking the gain controllers we arrive at the result seen in the above animation. It can be observed that the Yaw angle does not reach the specified setpoint yet since we have not implemented the `Yaw controller`.
+
+#### Yaw control 
+The yaw control is a simple P controller and it is decoupled from the other directions, that is why it was possible to leave it to the end. Note there is another gain that affects the Yaw angle beside the `kpYaw`. It is the 3rd (z) component of kpPQR gain.
+When it comes to controlling the drone around a specific angle reference, it is important to make sure that the controlled angle remains within working bounds. Observe in the Roll Pitch controller that we implemented, we had to make sure the reference tilt angle remains within bounds. Similarly for the Yaw control, we need to constrain the Yaw angle to [-Pi, Pi].
+
+Just to avoid any issue, we take the modulo 2*Pi of the reference yaw angle initially, since we want our angle to represent a value between [0, 2Pi]. We also make sure while implementing the code to verify that the error varies between [0, Pi] or [0, -Pi]. If we assume the counterclockwise sense is positive, them of error > Pi, e.g., error = 3*Pi/3 then it is exaclty the same as saying error = -Pi/2 when looking from the other sense. Therefere if the error > Pi we substract 2Pi and when error < Pi we add 2Pi. The Yaw controller is implemented in 
+
 
 
